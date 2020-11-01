@@ -140,5 +140,6 @@ dmypy.json
 cython_debug/
 
 # Removed photos and .h5 files
-.JPG
-.h5
+*.JPG
+*.h5
+*.pkl
