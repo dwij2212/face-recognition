@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.optimizers import Adam
 from losses import triple_loss, euclidean_dist
-from generate_dataset import read_images, generate_triplets, show_image, generate_pairs
+from generate_dataset import show_image
 import numpy as np
 import random
 import pickle
@@ -18,13 +18,9 @@ import time
 K.set_image_data_format = "channels_last"
 
 
-# faces = np.array(read_images("."))
-# siamese_net, net = baseline_model()
 optimiser = Adam(0.00001)
-# siamese_net.compile(
-#     optimizer=optimiser, loss="binary_crossentropy", metrics=["binary_accuracy"]
-# )
-# print(siamese_net.trainable_variables)
+
+
 def loss(model, x, y, training):
     y_pred = model(x)
 
@@ -61,6 +57,7 @@ def train(siamese_net, epochs=1):
         # Optimize the model
         loss_value, grads = grad(siamese_net, [anchor, positive, negative], targets=0)
         optimiser.apply_gradients(zip(grads, siamese_net.trainable_variables))
+
         # if not random.randint(0, 1):
         #     loss_value, grads = grad(siamese_net, [anchor, negative], targets=0)
         #     optimiser.apply_gradients(zip(grads, siamese_net.trainable_variables))
@@ -89,9 +86,9 @@ def pipeline1():
     except:
         siamese_net, net = resnet_transfer()
 
-    train_loss = train(siamese_net, 50)
+    train_loss = train(siamese_net, 30)
 
-    siamese_net.save("resnet_transfer.h5")
+    siamese_net.save("fine_tuned_networks/resnet_transfer.h5")
     plt.plot(train_loss)
     plt.ylabel("LOSS")
     plt.xlabel("EPOCHS")
@@ -99,10 +96,14 @@ def pipeline1():
 
 
 def visualise_outputs():
-    siamese_net = tf.keras.models.load_model("resnet_transfer.h5")
-    net = siamese_net.get_layer("sequential")
+    siamese_net = tf.keras.models.load_model("fine_tuned_networks/resnet_transfer.h5")
+    try:
+        net = siamese_net.get_layer("sequential")
+    except ValueError:
+        net = siamese_net.get_layer("sequential_1")
+    # net = siamese_net.get_layer("sequential")
 
-    with open("triplet-{}.pkl".format(4), "rb") as f:
+    with open("triplet-{}.pkl".format(2), "rb") as f:
         train_data = pickle.load(f)
 
     anchor = train_data[:, 0, :, :]
@@ -132,4 +133,7 @@ def visualise_outputs():
         )
 
 
+# pipeline1()
 visualise_outputs()
+# siamese_net = tf.keras.models.load_model("resnet_transfer.h5")
+# siamese_net.summary()

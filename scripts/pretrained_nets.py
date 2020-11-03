@@ -15,7 +15,7 @@ def inception_resnet_v2(path=None):
         l.trainable = False
 
     print("saving model")
-    model.save(os.path.join("trained_networks", path))
+    model.save(os.path.join("pre_trained_networks", path))
     model.summary()
 
 

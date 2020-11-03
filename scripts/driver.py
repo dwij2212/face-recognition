@@ -1,5 +1,8 @@
 # TODO
+from .face_detect import FaceDetector
+from .generate_dataset import read_images, generate_triplets
 
+path = input()
 """
 Nice wrapper code around the actual logic
     1. Add photos of friends
